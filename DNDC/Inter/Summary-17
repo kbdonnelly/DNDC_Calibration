@@ -1,0 +1,92 @@
+0	Site_ID:	
+M	Site_name:	
+9.47	Mean annual temperature (degree C):	
+1.02	Soil_bulk_density (g/cm3):	
+0.04	Initial_SOC (kg C/kg soil):	
+0.58	Clay_fraction:	
+6.70	Soil_pH:	
+Corn	Crop_type:	
+None	Crop_type:	
+None	Crop_type:	
+0.00	Irrigation_index:	
+0.00	Manure_amended (kg C/ha/yr):	
+
+5.31	N_deposit (kg N/ha/yr):	
+220.00	Fertilizer_N (kg N/ha/yr):	
+0.00	Manure_N (kg N/ha/yr):	
+0.00	Irrigation_N (kg N/ha/yr):	
+0.00	Root_N (kg N/ha/yr):	
+42.14	Crop_residue_N (kg N/ha/yr):	
+0.00	Soil_fixed_N (kg N/ha/yr):	
+0.00	N_fixation1 (kg N/ha/yr):	
+0.00	N_fixation2 (kg N/ha/yr):	
+0.00	N_fixation3 (kg N/ha/yr):	
+187.39	N_uptaken_by_crop1 (kg N/ha/yr):	
+0.00	N_uptaken_by_crop2 (kg N/ha/yr):	
+0.00	N_uptaken_by_crop3 (kg N/ha/yr):	
+0.00	Runoff N (kg N/ha/yr):	
+71.38	Nitrate_leached (kg N/ha/yr):	
+2.29	NH3_volatilization (kg N/ha/yr):	
+2.90	N2O_emission (kg N/ha/yr):	
+0.40	NO_emission (kg N/ha/yr):	
+2.11	N2_emission (kg N/ha/yr):	
+1107.66	C_input_from_crop_root (kg C/ha/yr):	
+1194.60	C_input_from_crop_shoot (kg C/ha/yr):	
+71.68	C_input_from_roots (kg C/ha/yr):	
+0.00	C_input_from_manure (kg C/ha/yr):	
+717.40	Soil_heterotrophic_CO2 (kg C/ha/yr):	
+-0.45	CH4_emission (kg C/ha/yr):	
+0.00	SOC_leaching (kg C/ha/yr):	
+
+952.38	Change_in_SOC (kg C/ha/yr):	
+
+1061.50	Annual precipitation (mm):	
+0	Irrigation			
+191	Transpiration1			
+0	Transpiration2			
+0	Transpiration3			
+337	Soil evaporation		
+178	Surface water evaporation	
+69	Run off			
+264	Leaching			
+0	Groundwater suply		
+
+6713.06	Crop_biomass1 (kg C/ha):	
+0.00	Crop_biomass2 (kg C/ha):	
+0.00	Crop_biomass3 (kg C/ha):	
+3692.19	Crop_grain1 (kg C/ha):	
+0.00	Crop_grain1 (kg C/ha):	
+0.00	Crop_grain1 (kg C/ha):	
+2349.57	Crop_shoot1 (kg C/ha):	
+0.00	Crop_shoot1 (kg C/ha):	
+0.00	Crop_shoot1 (kg C/ha):	
+671.31	Crop_root1 (kg C/ha):	
+0.00	Crop_root1 (kg C/ha):	
+0.00	Crop_root1 (kg C/ha):	
+189.13	Crop_N1 (kg N/ha):	
+0.00	Crop_N1 (kg N/ha):	
+0.00	Crop_N1 (kg N/ha):	
+5500.00	Optimum_grain1 (kg C/ha):	
+0.00	Optimum_grain1 (kg C/ha):	
+0.00	Optimum_grain1 (kg C/ha):	
+3500.00	Optimum_straw1 (kg C/ha):	
+0.00	Optimum_straw1 (kg C/ha):	
+0.00	Optimum_straw1 (kg C/ha):	
+1000.00	Optimum_root1 (kg C/ha):	
+0.00	Optimum_root1 (kg C/ha):	
+0.00	Optimum_root1 (kg C/ha):	
+285.13	Crop_water_demand1 (mm):	
+0.00	Crop_water_demand1 (mm):	
+0.00	Crop_water_demand1 (mm):	
+283.30	Crop_N_demand1 (kg N/ha):	
+0.00	Crop_N_demand1 (kg N/ha):	
+0.00	Crop_N_demand1 (kg N/ha):	
+2600.00	Crop_T_demand1 (degree):	
+0.00	Crop_T_demand1 (degree):	
+0.00	Crop_T_demand1 (degree):	
+0.00	TDD (degree):	
+0.00	TDD (degree):	
+0.00	TDD (degree):	
+126 287	Crop1 plant/harvest dates:	
+0 0	Crop1 plant/harvest dates:	
+0 0	Crop1 plant/harvest dates:	

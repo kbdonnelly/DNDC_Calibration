@@ -1,0 +1,110 @@
+  -------------------------------------------------------------------------------------
+  ANNUAL REPORT:   Site M     Year 13     Sun Jan 19 14:56:47 2025
+
+  -------------------------------------------------------------------------------------
+  SOIL SECTION: Unit kg C or N/ha 
+  -------------------------------------------------------------------------------------
+  SOM pools  -----Litter-----  -----Humads-----  -----Humus------  -----Total-----
+               C        N        C        N        C        N        C        N   
+  Day 1    4818.91    59.27  8609.36  1651.55 88948.42  12861.62  102596.84  14572.44
+  Day 365  5610.67    76.26  8965.12  1719.80 88798.44  12839.94  107635.40  14635.99
+  -------------------------------------------------------------------------------------
+  Inorganic N pools in kg N/ha
+
+                   NO3-     NH4+    NH3(w)   Urea     NO(w)    clay-NH4   N2O+N2   Total
+  Day 1            0.04     0.40     0.00     0.00     0.00     2.27     0.01     2.73
+  Day 365          0.44     1.22     0.00     0.00     0.00     2.46     0.00     4.11
+  -------------------------------------------------------------------------------------
+  Fluxes                         C (kg C/ha/yr)              N (kg N/ha/yr)
+
+  Inputs -------------------------------------------------------------------------------
+  Manure                            1726.07			   215.76
+  Shoot litter                      2085.19			    43.07
+  Root litter			    1625.93                         25.03
+  Root exudation		     113.02							
+  Rain-N deposit                                                     4.90
+  Irrigation N input                                                 0.00
+  Fertilizer-N                                                     123.20
+  Soil N fixation                                                    0.00
+
+  Outputs ------------------------------------------------------------------------------
+  Soil-CO2 emission                 2400.48
+  CH4 emission                        -0.43
+  Soil runoff                          0.00                          0.00
+  Soil leaching                      533.87                          1.12
+  Crop N uptake from soil                                          136.62
+  NH3 volatilization                                                 0.00
+  N2O                                                                1.08
+  NO                                                                 0.19
+  N2                                                                 1.58
+  Indirect N2O                                                       0.00
+  Indirect N2                                                        0.00
+  -------------------------------------------------------------------------------------
+  Mineralization: 2774.1 kg C/ha and   57.5 kg N/ha;   Soil C/N ratio:  7.4
+  --------------------------------------------------------------------------------------
+  Depth (cm)         kg C/kg           kg C/ha		Soil_weight_kg/ha
+    0 - 10           0.0340             31993.65		940593
+   10 - 20           0.0249             25847.40		1036497
+   20 - 30           0.0126             13832.79		1097358
+   30 - 40           0.0079              9016.84		1134244
+   40 - 50           0.0049              5640.69		1152688
+  -------------------------------------------------------------------------------------
+  CROP SECTION -99: Unit kg C or N/ha 
+  -------------------------------------------------------------------------------------
+  Cropping season	           1            2            3 
+  Crop name			Winter_wheat Silage_corn  Winter_wheat 
+  Planting date		         253          141          291 
+  Growing days		         223          124          262 
+  Growing season TDD	           0            0          248 
+  Water demand (mm)	       19.76       350.81         2.28 
+  Water uptake (mm)	        2.25       188.98         0.06 
+  Water stress		        2.76         0.94         0.37 
+  Crop N demand		      202.40       275.52       201.93 
+  Crop N from soil	        3.59       131.61         1.42 
+  Crop N from air NH3	        2.67         2.36         1.50 
+  Crop N fixation	        0.00         0.00         0.00 
+  Nitrogen stress	        3.35         0.64         0.47 
+
+  Annual crop biomass production:
+  Crop N (kg N/ha)	        6.26       133.96         2.93 
+  Crop C (kg C/ha)	      183.37      6370.89        58.41 
+  -- Grain C		        0.00      2665.90         0.00 
+  -- Leaf C		      131.25      1411.43        21.78 
+  -- stem C		      131.25      1411.43        21.78 
+  -- Root C		      103.27       882.14        14.85 
+
+  Photosynthesis (kg C/ha)          59.8
+  Shoot respiration                  1.1
+  Root respiration                  62.4
+  Crop NPP                          58.4
+  NEE                             2404.1
+  Stubble (kg C/ha)		   412.0
+  Fruit cut (kg C/ha)		       0       0       0
+  Leaf cut (kg C/ha)		       0       0       0
+  Stem cut (kg C/ha)		       0       0       0
+  Root cut (kg C/ha)		       0       0       0
+  Livestock feed demand (kg C/ha)        0
+  Grazed biomass (kg C/ha)	         0
+  --------------------------------------------------------------------------------------
+  WATER SECTION: Unit mm water/year
+  -------------------------------------------------------------------------------------
+  Precipitation			979.80
+  Irrigation			9.16
+  Manure water			0.00
+  PET				1494.80
+  Transpiration			191.29
+  Soil evaporation		445.83
+  Run off			61.99
+  Leaching			295.95
+  Soil profile water:	Initial 868.38;	End: 764.65
+  Deep water pool   :	Initial 0.00;	End: 0.00
+  Mean wind speed (m/s) 	3.06
+  -------------------------------------------------------------------------------------
+  Soil P (kg P/ha): Day 1-- 438.12; Day 365-- 428.34
+  Fertilizer P (kg P/ha): 0.00
+  Manure P (kg P/ha): 0.00
+  P flux of crop uptake (kg P/ha): 0.40
+  P flux of runoff (kg P/ha): 0.10
+  P flux of leaching (kg P/ha): 9.25
+  P flux of residue incorporation (kg P/ha): 0.04
+  -------------------------------------------------------------------------------------
