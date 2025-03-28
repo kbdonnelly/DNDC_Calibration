@@ -38,10 +38,10 @@ def simulator_run(theta):
     water_tr_std = torch.std(water_tr)
     
     # Calculating sum of weighted squared residuals:
-    sr1 = (1/torch.square(nitrate_tr_std))*torch.sum(torch.square(nitrate_tr - nitrate_est_tr))
-    sr2 = (1/torch.square(water_tr_std))*torch.sum(torch.square(water_tr - water_est_tr))
-    sr3 = torch.sum(torch.square(corn_tr - corn_est_tr))
-    sr4 = torch.sum(torch.square(wheat_tr - wheat_est_tr))
+    sr1 = torch.sqrt((1/len(nitrate_tr))*torch.sum(torch.square(nitrate_tr - nitrate_est_tr)))/torch.max(nitrate_tr)
+    sr2 = torch.sqrt((1/len(water_tr))*torch.sum(torch.square(water_tr - water_est_tr)))/torch.max(water_tr)
+    sr3 = torch.sqrt(torch.sum(torch.square(corn_tr - corn_est_tr)))/corn_tr
+    sr4 = torch.sqrt(torch.sum(torch.square(wheat_tr - wheat_est_tr)))/wheat_tr
     
     output = torch.tensor([sr1,sr2,sr3,sr4])
        
