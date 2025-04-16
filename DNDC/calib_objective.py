@@ -16,6 +16,8 @@ import matplotlib.pyplot as plt
 seed = 0   # Use this so that seed is consistent across algos.
 simulator = DNDC()
 input_dim = simulator.theta_dim
+
+
     
 def simulator_run(theta):  
     
@@ -25,6 +27,7 @@ def simulator_run(theta):
     
     theta_scaled = LB + (UB - LB)*theta
     
+    theta_scaled  = simulator.nom_params
     # Running model to obtain desired outputs:    
     nitrate_est_tr, water_est_tr, corn_est_tr, wheat_est_tr = simulator.model_run(theta_scaled)
     
@@ -33,10 +36,7 @@ def simulator_run(theta):
     water_tr = simulator.water_tr
     corn_tr = simulator.corn_tr
     wheat_tr = simulator.wheat_tr
-    
-    nitrate_tr_std = torch.std(nitrate_tr)
-    water_tr_std = torch.std(water_tr)
-    
+       
     # Calculating sum of weighted squared residuals:
     sr1 = torch.sqrt((1/len(nitrate_tr))*torch.sum(torch.square(nitrate_tr - nitrate_est_tr)))/torch.max(nitrate_tr)
     sr2 = torch.sqrt((1/len(water_tr))*torch.sum(torch.square(water_tr - water_est_tr)))/torch.max(water_tr)
@@ -56,6 +56,10 @@ def objective_function(sr1, sr2, sr3, sr4):
     ssr = sr1 + sr2 + sr3 + sr4
   
     return ssr
+
+if __name__== '__main__':
+    theta = torch.rand(1,34)
+    simulator_run(theta[0])
              
 
   
