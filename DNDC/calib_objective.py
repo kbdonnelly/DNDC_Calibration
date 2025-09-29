@@ -9,16 +9,20 @@ import torch
 import numpy as np
 import pandas as pd
 from torch import Tensor
+from torch.quasirandom import SobolEngine
+from scipy.optimize import minimize
+
 from DNDCrun import DNDC
 from turbo_1 import Turbo1
-
+from turbo_c import cTurbo1
+SMOKE_TEST = False
 
 import matplotlib.pyplot as plt
 
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+dtype = torch.double
+
 # torch.set_default_dtype(torch.double)
-
-seed = 0   # Use this so that seed is consistent across algos.
-
 
 class ObjFunc:
     def __init__(self):  
@@ -54,17 +58,17 @@ class ObjFunc:
 if __name__== '__main__':
     f = ObjFunc()
     dim = f.theta_dim
-    run_type = ['TuRBO-1'] # Types accepted: ['Rand','Input','TuRBO-1','TuRBO-C','SCE-UA','L-BFGS-B']
+    run_type = ['L-BFGS-B'] # Types accepted: ['Rand','Input','TuRBO-1','TuRBO-C','SCE-UA','L-BFGS-B']
     plotting = False # Option for turning plotting on/off
-    seed = 0    
-    
-    if run_type == ['Rand']:
-        theta = torch.rand(1,dim)
-        output = f(theta.squeeze(0))
+    seed = 0
        
     if run_type == ['Input']:
         theta = torch.rand(1,dim)
-         
+    
+    if run_type == ['Rand']:
+        theta = torch.rand(1,dim)
+        output = f(theta.squeeze(0))    
+    
     if run_type == ['TuRBO-1']:
             
         turbo1 = Turbo1(
@@ -72,7 +76,7 @@ if __name__== '__main__':
              lb = np.zeros(f.theta_dim),  # Numpy array specifying lower bounds
              ub = np.ones(f.theta_dim),  # Numpy array specifying upper bounds
              n_init = 2*dim,  # Number of initial bounds from an Latin hypercube design
-             max_evals = 200,  # Maximum number of evaluations
+             max_evals = 70,  # Maximum number of evaluations
              batch_size = 10,  # How large batch size TuRBO uses
              verbose = True,  # Print information from each batch
              use_ard = True,  # Set to true if you want to use ARD for the GP kernel
@@ -93,15 +97,82 @@ if __name__== '__main__':
         print("Best value found:\n\tf(x) = %.3f\nObserved at:\n\tx = %s" % (f_best, np.around(x_best, 3)))
          
         df_theta_TuRBO1 =  pd.DataFrame(X)
-        df_theta_TuRBO1.to_csv('df_theta_TuRBO1_seed0.csv', sep=',', index = False, encoding='utf-8')
+        df_theta_TuRBO1.to_csv('df_theta_TuRBO1_seed1.csv', sep=',', index = False, encoding='utf-8')
            
         df_output_TuRBO1 =  pd.DataFrame(fX)
-        df_output_TuRBO1.to_csv('df_output_TuRBO1_seed0.csv', sep=',', index = False, encoding='utf-8')
+        df_output_TuRBO1.to_csv('df_output_TuRBO1_seed1.csv', sep=',', index = False, encoding='utf-8')
          
-     # if run_type == ['L-BFGS-B']:
+    if run_type == ['TuRBO-C']:
+        # Setting initial parameters:
+        batch_size = 10
+        n_init = 2 * dim
+        max_evals = 2000 if not SMOKE_TEST else 10
+        max_cholesky_size = float("inf")  # Always use Cholesky
+        weights = torch.tensor([1.0, 1.0, 1.0, 1.0])
+       
+        def g(x):
+            return -f(x)
+        
+        cturbo1 = cTurbo1(g, weights, dim, n_init, max_evals, batch_size, max_attempts=5, acqf='ts', max_data_length=500, n_candidates=2000, num_restarts=5, raw_samples=2056, seed=seed)
+        
+        cturbo1.optimize()
+        
+        Y_cturbo = cturbo1.fX
+        Y_opt_cturbo = Y_cturbo.max().item()
+        X_opt_cturbo = cturbo1.X[torch.argmax(cturbo1.fX)].detach().numpy()
+        print("Best-found input:", X_opt_cturbo)
+        print("Best-found objective value:", Y_opt_cturbo)
+        
+        df_theta_TuRBOC =  pd.DataFrame(cturbo1.X)
+        df_theta_TuRBOC.to_csv('df_theta_TuRBOC_seed4.csv', sep=',', index = False, encoding='utf-8')
+           
+        df_output_TuRBOC =  pd.DataFrame(Y_cturbo)
+        df_output_TuRBOC.to_csv('df_output_TuRBOC_seed4.csv', sep=',', index = False, encoding='utf-8')
 
+    if run_type == ['L-BFGS-B']:
+        # Store evaluations:
+        X_eval = []
+        F_eval = []
 
-  
+        # Define objective function:
+        def objective(x):
+            x_tensor = torch.tensor(x)
+            fx = -torch.sum(f(x_tensor)).numpy()
+            X_eval.append(x.copy())
+            F_eval.append(fx)
+            print(f"Eval {len(F_eval):03d}: = {fx:.6f}")
+            return fx          
 
-                  
-
+        # Initial parameters:
+        sobol = SobolEngine(dimension=dim, scramble=True, seed=seed)
+        x0 = sobol.draw(n=1).to(dtype=dtype, device=device)
+        x0 = x0.squeeze(0).numpy()
+        bounds = [tuple(t) for t in np.tile([0, 1], (f.theta_dim, 1))]
+        
+        
+        # Run optimization
+        result = minimize(
+            fun=objective,
+            x0=x0,
+            method='L-BFGS-B',
+            bounds=bounds,
+            options={
+                'maxfun': 100,    # Max number of function evaluations
+                'disp': True      # Show optimizer messages
+            }
+        )
+        
+        # # Output results
+        # print("\nOptimization Complete:")
+        # print(f"Success: {result.success}")
+        # print(f"Message: {result.message}")
+        # print(f"Optimal x: {result.x}")
+        # print(f"Optimal f(x): {result.fun}")
+        
+        # if len(F_eval) < 2000:
+        #   for i in range(2000-len(F_eval)):
+        #     F_eval.append(F_eval[-1])
+                
+        
+        
+        
