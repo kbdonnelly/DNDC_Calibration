@@ -4,13 +4,14 @@
 Calibration Objective for Environmental Model Calibration
 @author: donnelly.235
 """
+import os
 import sys
 import torch
 import numpy as np
 import pandas as pd
 from torch import Tensor
 from torch.quasirandom import SobolEngine
-from scipy.optimize import minimize
+import sceua
 
 from DNDCrun import DNDC
 from turbo_1 import Turbo1
@@ -18,6 +19,9 @@ from turbo_c import cTurbo1
 SMOKE_TEST = False
 
 import matplotlib.pyplot as plt
+import scipy.stats as stats
+import matplotlib.dates as mdates
+import datetime
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 dtype = torch.double
@@ -28,6 +32,7 @@ class ObjFunc:
     def __init__(self):  
         self.simulator = DNDC()
         self.theta_dim = self.simulator.theta_dim
+        self.nom_params = self.simulator.nom_params
         
         self.LB = self.simulator.LB
         self.UB = self.simulator.UB
@@ -58,8 +63,9 @@ class ObjFunc:
 if __name__== '__main__':
     f = ObjFunc()
     dim = f.theta_dim
-    run_type = ['L-BFGS-B'] # Types accepted: ['Rand','Input','TuRBO-1','TuRBO-C','SCE-UA','L-BFGS-B']
-    plotting = False # Option for turning plotting on/off
+    run_type = ['SCE-UA'] # Types accepted: ['Rand','Input','TuRBO-1','TuRBO-C','SCE-UA','L-BFGS-B']
+    plotting_allseeds = False # Option for turning plotting on/off
+    plotting_bestseed = False
     seed = 0
        
     if run_type == ['Input']:
@@ -147,7 +153,7 @@ if __name__== '__main__':
         sobol = SobolEngine(dimension=dim, scramble=True, seed=seed)
         x0 = sobol.draw(n=1).to(dtype=dtype, device=device)
         x0 = x0.squeeze(0).numpy()
-        bounds = [tuple(t) for t in np.tile([0, 1], (f.theta_dim, 1))]
+        bounds = [(0, 1)] * f.theta_dim
         
         
         # Run optimization
@@ -162,17 +168,152 @@ if __name__== '__main__':
             }
         )
         
-        # # Output results
-        # print("\nOptimization Complete:")
-        # print(f"Success: {result.success}")
-        # print(f"Message: {result.message}")
-        # print(f"Optimal x: {result.x}")
-        # print(f"Optimal f(x): {result.fun}")
+        # Output results
+        print("\nOptimization Complete:")
+        print(f"Success: {result.success}")
+        print(f"Message: {result.message}")
+        print(f"Optimal x: {result.x}")
+        print(f"Optimal f(x): {result.fun}")
         
-        # if len(F_eval) < 2000:
-        #   for i in range(2000-len(F_eval)):
-        #     F_eval.append(F_eval[-1])
-                
+        if len(F_eval) < 2000:
+          for i in range(2000-len(F_eval)):
+            F_eval.append(F_eval[-1])
+    
+    if run_type == ['SCE-UA']:
+        # Store evaluations:
+        X_eval = []
+        F_eval = []
+        bounds = [(0, 1)] * f.theta_dim
         
+        # Define objective function:
+        def objective(x):
+            x_tensor = torch.tensor(x)
+            fx = torch.sum(f(x_tensor)).numpy()
+            X_eval.append(x.copy())
+            F_eval.append(fx)
+            print(f"Eval {len(F_eval):03d}: = {fx:.6f}")
+            return fx                 
+        
+        # Run optimization
+        result = sceua.minimize(
+            objective,
+            bounds,
+            args=(),
+            n_complexes=None,
+            n_points_complex=None,
+            alpha=1.0,
+            beta=0.5,
+            max_evals=2000,
+            max_iter=1000,
+            max_tolerant_iter=1000,
+            tolerance=1e-06,
+            x_tolerance=1e-08,
+            seed=seed,
+            pca_freq=1,
+            pca_tol=0.001,
+            x0=None,
+            max_workers=1
+            )
+            
+        # Output results
+        print("\nOptimization Complete:")
+        print(f"Success: {result.success}")
+        print(f"Message: {result.message}")
+        print(f"Optimal x: {result.x}")
+        print(f"Optimal f(x): {result.fun}")
+        
+        df_theta_SCEUA =  pd.DataFrame(result.xv)
+        df_theta_SCEUA.to_csv('df_theta_SCEUA_seed0.csv', sep=',', index = False, encoding='utf-8')
+           
+        df_output_SCEUA =  pd.DataFrame(result.funv)
+        df_output_SCEUA.to_csv('df_output_SCEUA_seed0.csv', sep=',', index = False, encoding='utf-8')
+        
+        
+        
+    if plotting_allseeds == True:  
+        
+        # Select which methods are to be plotted:
+        
+        methods = ['TuRBO-1','TuRBO-C']
+        colors = ['orange','red']
+        
+        # Imports data from methods selected, and plots:
+        
+        nom_params_scaled = (f.nom_params-f.LB)/(f.UB-f.LB)
+        baseline = torch.sum(f(nom_params_scaled))
+        fig, ax = plt.subplots(figsize=(8, 6))           
+        for i in range(len(methods)):
+            folder_path = 'C:\\DNDC\\Optimization_Data\\' + methods[i] + '\\ObjFunc'
+            all_files = os.listdir(folder_path)
+            df = pd.DataFrame() 
+            for j in range(len(all_files)):
+                df_data = pd.read_csv(folder_path + '\\' + all_files[j])
+                df.loc[:,j] = pd.DataFrame(np.minimum.accumulate(df_data.to_numpy()))
+            # Calculate average loss, create bounds:
+            average = torch.mean(torch.tensor(df.to_numpy())[0:2000],dim=1)
+            std = torch.std(torch.tensor(df.to_numpy())[0:2000],dim=1)
+            lcb = average - std
+            ucb = average + std
+            x = np.arange(len(average))
+            print(average[-1])
+            plt.plot(average, marker="s", lw=3,c=colors[i],markevery=100,label=methods[i])
+            plt.fill_between(x, lcb.detach().numpy(), ucb.detach().numpy(), color=colors[i], alpha=0.2,label='_nolegend_')
+        plt.axhline(baseline.item(),xmin=0,xmax=2000,lw=3,linestyle="--",color='k',label = 'Bhattarai et al. (2022)')  
+        plt.legend(loc='upper right',fontsize=12)    
+        # ax.set_yscale('log')
+        plt.xticks(fontsize=16)
+        plt.yticks(fontsize=16)
+        plt.ylabel("NRMSE", fontsize = 16)
+        plt.xlabel("Model Evaluations", fontsize = 16)
+        plt.ylim([0.09,1.1])
+        plt.xlim([0,500])
+        plt.grid(True)
+        plt.tight_layout()
+        plt.show()    
+     
+    if plotting_bestseed == True:  
+
+        import matplotlib.pyplot as plt
+        import scipy.stats as stats
+        import matplotlib.dates as mdates
+        import datetime
+        
+        # Select which methods are to be plotted:
+            
+        methods = ['TuRBO-C']
+        colors = ['red']
+        
+        # Imports data from methods selected, and determines lowest NRMSE:
+            
+        
+        nom_params_scaled = (f.nom_params-f.LB)/(f.UB-f.LB)
+        baseline = torch.sum(f(nom_params_scaled))
+        fig, ax = plt.subplots(figsize=(8, 6))
+        for i in range(len(methods)):
+            folder_path = 'C:\\DNDC\\Optimization_Data\\' + methods[i] + '\\ObjFunc'
+            all_files = os.listdir(folder_path)
+            df = pd.DataFrame() 
+            for j in range(len(all_files)):
+                df_data = pd.read_csv(folder_path + '\\' + all_files[j])
+                df.loc[:,j] = pd.DataFrame(np.minimum.accumulate(df_data.to_numpy()))
+            allseeds = torch.tensor(df.to_numpy())[0:2000]    
+            best_nrmse_index = torch.argmin(allseeds[-1])
+            best_csv_path = folder_path + '\\' + 'df_output_' + methods[i] + '_seed' + str(best_nrmse_index.item()) +'.csv'
+            plt.plot(np.minimum.accumulate(allseeds[:,best_nrmse_index].numpy()), marker="s", lw=3,c=colors[i],markevery=100,label=methods[i])
+            plt.plot(pd.read_csv(best_csv_path).iloc[:,0].to_numpy(), marker=".",c=colors[i],linestyle="none",label=methods[i]+': Iterations',alpha=0.2)
+        
+        plt.axhline(baseline.item(),xmin=0,xmax=2000,lw=3,linestyle="--",color='k',label = 'Bhattarai et al. (2022)')  
+        plt.legend(loc='upper right',fontsize=12)    
+        # ax.set_yscale('log')
+        plt.xticks(fontsize=16)
+        plt.yticks(fontsize=16)
+        plt.ylabel("NRMSE", fontsize = 16)
+        plt.xlabel("Model Evaluations", fontsize = 16)
+        plt.ylim([0.09,1.1])
+        plt.xlim([0,2000])
+        plt.grid(True)
+        plt.tight_layout()
+        plt.show()    
+             
         
         
